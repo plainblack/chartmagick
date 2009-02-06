@@ -6,6 +6,21 @@ use Chart::Magick::Marker;
 
 use base qw{ Chart::Magick::Chart }; 
 
+
+#-------------------------------------------------------------------
+sub definition {
+    my $class = shift;
+
+    my $definition = $class->SUPER::definition(@_);
+
+    my $properties = {
+        plotMarkers     => 1,
+    };
+
+    return { %$definition, %$properties };
+}
+
+
 #-------------------------------------------------------------------
 sub plot {
     my $self = shift;

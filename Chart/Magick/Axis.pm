@@ -7,9 +7,9 @@ use Image::Magick;
 use constant pi => 3.14159265358979;
 
 readonly charts         => my %charts;
-readonly options        => my %options;
+private  properties     => my %properties;
 private  plotOptions    => my %plotOptions;
-readonly im             => my %magick;
+private  im             => my %magick;
 
 #----------------------------------------------
 sub _buildObject {
@@ -24,28 +24,61 @@ sub _buildObject {
     my $id = id $self;
 
     $charts{ $id }  = [];
-    $options{ $id } = { %{ $self->definition }, %{ $properties } } || {};
-    $magick{ $id }  = $magick;
+    $properties{ $id } = { %{ $self->definition }, %{ $properties } } || {};
 
     return $self;
 }
 
-#----------------------------------------------
-sub new {
-    my $class       = shift;
-    my $properties  = shift || {};
-    
-    my $width   = $properties->{ width  } || die "no height";
-    my $height  = $properties->{ height } || die "no width";
+sub im {
+    my $self = shift;
+
+    my $im = $magick{ id $self };
+    return $im if $im;
+
+    my $width   = $self->get('width')   || die "no height";
+    my $height  = $self->get('height')  || die "no width";
     my $magick  = Image::Magick->new(
         size        => $width.'x'.$height,
     );
     $magick->Read('xc:white');
+    $magick{ id $self } = $magick;
 
-    return $class->_buildObject( $properties, $magick );
+    return $magick;
+}
+
+#----------------------------------------------
+=head2 new ( [ properties ] )
+
+Contructor for this axis.
+
+=cut
+
+sub new {
+    my $class       = shift;
+    my $properties  = shift || {};
+    
+#    my $width   = $properties->{ width  } || die "no height";
+#    my $height  = $properties->{ height } || die "no width";
+#    my $magick  = Image::Magick->new(
+#        size        => $width.'x'.$height,
+#    );
+#    $magick->Read('xc:white');
+#
+#    return $class->_buildObject( $properties, $magick );
+    return $class->_buildObject( $properties );
 }
 
 #---------------------------------------------
+=head2 addChart ( chart )
+
+Adds a chart to this axis.
+
+=head3 chart
+
+An instantiated Chart::Magick::Chart object.
+
+=cut
+
 sub addChart {
     my $self    = shift;
     my $chart   = shift;
@@ -61,6 +94,9 @@ sub definition {
     my $self = shift;
 
     my %options = (
+        width           => 400,
+        height          => 300,
+
         marginLeft      => 40,
         marginTop       => 50,
         marginRight     => 20,
@@ -107,16 +143,17 @@ sub draw {
 
 #---------------------------------------------
 sub get {
-    my $self    = shift;
-    my $key     = shift;
+    my $self        = shift;
+    my $key         = shift;
+    my $properties  = $properties{ id $self };
 
     if ($key) {
         #### TODO: handle error and don't die?
-        die "invalid key: [$key]" unless exists $self->options->{ $key };
-        return $self->options->{ $key }
+        die "invalid key: [$key]" unless exists $properties->{ $key };
+        return $properties->{ $key };
     }
     else {
-        return { %{ $self->options } };
+        return { %{ $properties } };
     }
 }
 
@@ -162,11 +199,14 @@ sub preprocessData {
 #---------------------------------------------
 sub set {
     my $self    = shift;
-    my $key     = shift;
-    my $value   = shift;
+    my %update  = ref $_[0] eq 'HASH' ? %{ $_[0] } : @_;
 
-    if ( exists $self->options->{ $key } ) {
-        $options{ id $self }->{ $key } = $value;
+    my $properties  = $properties{ id $self };
+
+    while ( my ($key, $value) = each %update ) {
+        if ( exists $properties->{ $key } ) {
+            $properties->{ $key } = $value;
+        }
     }
 }
 

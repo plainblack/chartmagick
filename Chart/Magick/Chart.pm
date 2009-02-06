@@ -105,10 +105,15 @@ sub preprocessData {
 #-------------------------------------------------------------------
 sub set {
     my $self    = shift;
-    my $key     = shift;
-    my $value   = shift;
+    my %update  = ref $_[0] eq 'HASH' ? %{ $_[0] } : @_;
 
-    $properties{ id $self }->{ $key } = $value;
+    my $properties  = $properties{ id $self };
+
+    while ( my ($key, $value) = each %update ) {
+        if ( exists $properties->{ $key } ) {
+            $properties->{ $key } = $value;
+        }
+    }
 }
 
 1;

@@ -216,6 +216,7 @@ sub preprocessData {
         }
     }
 
+    $maxY = 1 if ($minY == 0 && $maxY == 0);
 ###############################
     my $yTickWidth = $self->get('yTickWidth') || $self->calcTickWidth( $minY, $maxY, $self->get('yTickCount') );
     my $xTickWidth = $self->get('xTickWidth') || $self->calcTickWidth( $minX, $maxX, $self->get('xTickCount') );
@@ -238,7 +239,6 @@ sub preprocessData {
 ###############################
 
     $self->autoRangeMargins;
-
     # Calculate the pixels per unit in the y axis.
     my $yPxPerUnit = $self->plotOption( 'chartHeight' ) / ( $maxY - $minY );
     $self->plotOption( yPxPerUnit => $yPxPerUnit );

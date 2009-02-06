@@ -55,8 +55,9 @@ $canvas->matrix( 2, 2, { 1 => 'Chart::Magick::Axis::LinLog', 3 => 'Chart::Magick
 my $axis = $canvas->getAxis( 0 );
 $axis->addChart( $barChart );
 $axis->set('xSubtickCount', 0);
-$axis->set('xTickOffset', 1);
+$axis->set('xTickOffset', 0.25);
 $axis->set('title', 'Bars');
+my $config = $axis->get;
 
 # Second chart
 $axis = $canvas->getAxis( 1 );
@@ -68,8 +69,9 @@ $axis->set('title', 'Logarithmic plot');
 $axis = $canvas->getAxis( 2 );
 $axis->addChart( $barChart );
 $axis->addChart( $lineChart );
-$axis->set('xTickOffset', 1);
-$axis->set('title', 'Multiple chart types on one axis');
+#$axis->set('xTickOffset', 1);
+#$axis->set('title', 'Multiple chart types on one axis');
+$axis->set( $config );
 
 # Fourth chart
 $axis = $canvas->getAxis( 3 );
